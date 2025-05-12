@@ -99,3 +99,4 @@ Next.js와 스마트컨트랙트를 활용하여 프로젝트 중심으로 학�
 - 📡 RPC 서비스: Infura, Alchemy, Moralis
 - 🐞 디버깅: Tenderly
 - 🔍 트랜잭션 확인: Etherscan
+- 노션 정리 : https://www.notion.so/1f1d5406652e8028a505cc80559b4fe2?v=1f1d5406652e813aa2e6000c0fb3c3f6
