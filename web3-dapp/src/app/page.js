@@ -1,13 +1,17 @@
-// app/page.js
-// 메인 페이지 컴포넌트입니다.
-// WalletConnectButton을 통해 지갑 연결/해제 기능을 제공합니다.
+// src/app/page.js
+"use client";
 import WalletConnectButton from "../components/WalletConnectButton";
+// 👇 TokenBalance 컴포넌트 임포트
+import TokenBalance from "../components/TokenBalance";
 
-export default function HomePage() {
+export default function Home() {
   return (
-    <div>
-      <h1>Web3 DApp</h1> {/* 앱 제목 */}
-      <WalletConnectButton /> {/* 지갑 연결/해제 버튼 */}
-    </div>
+    <main>
+      <h1>토큰 전송 Dapp</h1>
+      <WalletConnectButton />
+      {/* 👇 여기에 TokenBalance 컴포넌트 배치 */}
+      <TokenBalance />
+      {/* 앞으로 토큰 전송 UI가 여기에 추가될 예정 */}
+    </main>
   );
 }

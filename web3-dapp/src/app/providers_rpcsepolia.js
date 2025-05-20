@@ -3,22 +3,17 @@
 
 import { WagmiProvider, createConfig, http } from "wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-// Sepolia, mainnet 대신 localhost 임포트
-import { localhost } from "wagmi/chains";
+import { sepolia, mainnet } from "wagmi/chains";
 import { injected } from "@wagmi/connectors";
 
 // wagmi v1/v2 방식
 const config = createConfig({
-  autoConnect: true,
-  connectors: [injected()],
-  // 사용할 체인 설정: 로컬호스트만 사용
-  chains: [localhost],
+  autoConnect: true, // 이전에 연결된 지갑을 자동으로 연결
+  connectors: [injected()], // injected connector 사용 (MetaMask와 같은 브라우저 지갑)
+  chains: [sepolia, mainnet], // 사용할 체인 설정
   transports: {
-    // 로컬호스트 RPC URL 설정 (Hardhat 기본값)
-    [localhost.id]: http("http://127.0.0.1:8545"),
-    // Sepolia, mainnet 설정은 제거하거나 주석 처리
-    // [sepolia.id]: http("https://rpc.sepolia.org"),
-    // [mainnet.id]: http(),
+    [sepolia.id]: http("https://rpc.sepolia.org"), // Sepolia 테스트넷의 RPC URL 설정
+    [mainnet.id]: http(), // 메인넷은 기본 public provider 사용
   },
 });
 
