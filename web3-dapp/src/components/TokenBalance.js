@@ -1,24 +1,16 @@
+// src/components/TokenBalance.js
 "use client";
 import { useAccount, useReadContract } from "wagmi";
 import { formatUnits } from "ethers";
-import { useState, useEffect } from "react"; // useEffect 임포트
+import { useState, useEffect } from "react";
 
-// 👇 수동으로 정의한 erc20Abi 배열을 삭제하거나 주석 처리합니다.
-// const erc20Abi = [
-//   "function balanceOf(address owner) view returns (uint256)",
-//   "function decimals() view returns (uint8)",
-//   "function symbol() view returns (string)",
-// ];
-
-// 👇 Hardhat이 생성한 ABI 파일에서 ABI 정보를 임포트합니다.
-// artifacts 폴더는 프로젝트 루트에 있습니다.
 import MyTokenAbi from "../../artifacts/contracts/MyToken.sol/MyToken.json";
 
-// 로컬 Hardhat에 배포한 MyToken 컨트랙트 주소
-const TOKEN_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3"; // 현재 사용하시는 실제 주소로 변경
+const TOKEN_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3"; // 실제 배포된 주소로 변경
 
-export default function TokenBalance() {
-  const [mounted, setMounted] = useState(false); // 👈 mounted 상태 추가
+// 👇 props로 onRefetchReady 함수를 받도록 수정 (refetch 함수 자체가 아닌, 준비 완료 신호)
+export default function TokenBalance({ onRefetchReady }) {
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -27,9 +19,9 @@ export default function TokenBalance() {
   const { address, isConnected } = useAccount();
 
   // 잔액 조회
-  const { data: balance } = useReadContract({
+  const { data: balance, refetch } = useReadContract({
+    // 👈 refetch 함수는 내부에서만 사용
     address: TOKEN_ADDRESS,
-    // 👇 임포트한 ABI 객체의 abi 속성을 사용합니다.
     abi: MyTokenAbi.abi,
     functionName: "balanceOf",
     args: [address],
@@ -39,7 +31,6 @@ export default function TokenBalance() {
   // 소수점 자리수 조회
   const { data: decimals } = useReadContract({
     address: TOKEN_ADDRESS,
-    // 👇 임포트한 ABI 객체의 abi 속성을 사용합니다.
     abi: MyTokenAbi.abi,
     functionName: "decimals",
     query: { enabled: !!address && mounted },
@@ -48,11 +39,24 @@ export default function TokenBalance() {
   // 심볼 조회
   const { data: symbol } = useReadContract({
     address: TOKEN_ADDRESS,
-    // 👇 임포트한 ABI 객체의 abi 속성을 사용합니다.
     abi: MyTokenAbi.abi,
     functionName: "symbol",
     query: { enabled: !!address && mounted },
   });
+
+  // 👇 refetch 함수가 준비되면 부모에게 준비 완료 신호와 함께 내부 refetch 함수를 전달
+  // 부모는 이 함수를 state에 저장하지 않고, 직접 호출할 수 있는 형태로 TokenTransfer에 전달합니다.
+  useEffect(() => {
+    if (typeof onRefetchReady === "function" && refetch) {
+      // refetch 함수가 유효한지 확인
+      // 부모에게 refetch를 실행할 수 있는 콜백 함수를 전달
+      const triggerRefetch = () => {
+        console.log("TokenBalance: 부모로부터 refetch 요청 받음, 실행합니다.");
+        refetch(); // 👈 내부 refetch 함수 호출
+      };
+      onRefetchReady(triggerRefetch); // 👈 triggerRefetch 함수 자체를 부모에게 전달
+    }
+  }, [refetch, onRefetchReady]); // refetch 함수가 변경될 때마다 부모에게 전달
 
   if (!mounted) {
     return null;
@@ -65,7 +69,6 @@ export default function TokenBalance() {
     return <div>잔액 조회 중...</div>;
   }
 
-  // 👇 모든 데이터가 로드되면 이 부분이 실행됩니다.
   return (
     <div>
       <strong>내 토큰 잔액:</strong>{" "}
