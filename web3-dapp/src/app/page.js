@@ -4,7 +4,7 @@ import { useState, useCallback } from "react"; // 👈 useState, useCallback 임
 import WalletConnectButton from "../components/WalletConnectButton";
 import TokenBalance from "../components/TokenBalance";
 import TokenTransfer from "../components/TokenTransfer";
-
+import TokenTransferHistory from "../components/TokenTransferHistory";
 export default function Home() {
   // 👈 TokenBalance로부터 받을 triggerRefetch 함수를 저장할 state
   const [triggerBalanceRefetch, setTriggerBalanceRefetch] = useState(null);
@@ -27,6 +27,8 @@ export default function Home() {
       <hr style={{ margin: "20px 0" }} />
       {/* 👇 triggerBalanceRefetch state 값을 TokenTransfer에 prop으로 전달 */}
       <TokenTransfer triggerBalanceRefetch={triggerBalanceRefetch} />
+      <hr style={{ margin: "20px 0" }} />
+      <TokenTransferHistory />
     </main>
   );
 }
